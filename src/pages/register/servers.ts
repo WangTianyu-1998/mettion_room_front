@@ -8,6 +8,6 @@ export async function registerCaptcha(email: string) {
   });
 }
 
-export async function register(registerUser: any) {
+export async function registerApi(registerUser: any) {
   return await instance.post('/user/register', registerUser);
 }

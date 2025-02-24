@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import axios, { type Method } from 'axios';
+import axios, { AxiosRequestConfig, type Method } from 'axios';
 
 const baseURL = 'http://localhost:3005/';
 const instance = axios.create({
@@ -9,10 +9,11 @@ const instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(
   function (config) {
-    // const store = useUserStore()
-    // if (store.user?.token) {
-    //   config.headers.Authorization = `Bearer ${store.user.token}`
-    // }
+    const accessToken = localStorage.getItem('access_token');
+
+    if (accessToken) {
+      config.headers.authorization = 'Bearer ' + accessToken;
+    }
     return config;
   },
   function (error) {
@@ -20,7 +21,12 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
+interface PendingTask {
+  config: AxiosRequestConfig;
+  resolve: Function;
+}
+let refreshing = false;
+const queue: PendingTask[] = [];
 // 添加响应拦截器
 instance.interceptors.response.use(
   function (response) {
@@ -31,7 +37,42 @@ instance.interceptors.response.use(
     }
     return response.data;
   },
-  function (error) {
+  async function (error) {
+    if (!error.response) {
+      return Promise.reject(error);
+    }
+    let { data, config } = error.response;
+    if (refreshing) {
+      return new Promise((resolve) => {
+        queue.push({
+          config,
+          resolve,
+        });
+      });
+    }
+    if (data.code === 401 && !config.url.includes('/user/refresh')) {
+      refreshing = true;
+
+      const res = await refreshToken();
+
+      refreshing = false;
+
+      if (res.status === 200 || res.status === 201) {
+        queue.forEach(({ config, resolve }) => {
+          resolve(instance(config));
+        });
+
+        return instance(config);
+      } else {
+        message.error(res.data);
+
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+      }
+      return Promise.reject(res);
+    }
+
     if (error.response.data.code !== 200) {
       message.error(error.response.data.data || '业务处理失败');
       // 中断代码执行
@@ -49,11 +90,7 @@ type Data<T> = {
   data: T;
 };
 
-const request = <T>(
-  url: string,
-  method: Method = 'GET',
-  submitData?: object
-) => {
+const request = <T>(url: string, method: Method = 'GET', submitData?: object) => {
   // return instance.request<{ name: 'jack'; age: 20 }, { name: 'jack'; age: 20 }>(
   return instance.request<T, Data<T>>({
     url,
@@ -64,3 +101,14 @@ const request = <T>(
 };
 
 export { baseURL, instance, request };
+
+async function refreshToken() {
+  const res = await instance.get('/user/refresh', {
+    params: {
+      refresh_token: localStorage.getItem('refresh_token'),
+    },
+  });
+  localStorage.setItem('access_token', res.data.access_token || '');
+  localStorage.setItem('refresh_token', res.data.refresh_token || '');
+  return res;
+}

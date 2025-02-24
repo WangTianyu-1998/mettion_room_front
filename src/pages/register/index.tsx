@@ -1,7 +1,9 @@
 import { Button, Form, Input, message } from 'antd';
 import './index.css';
 import { useForm } from 'antd/es/form/Form';
-import { registerCaptcha } from './servers';
+import { registerApi, registerCaptcha } from './servers';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface RegisterUser {
   username: string;
@@ -11,10 +13,6 @@ export interface RegisterUser {
   email: string;
   captcha: string;
 }
-
-const onFinish = async (values: RegisterUser) => {
-  console.log(values);
-};
 
 const layout1 = {
   labelCol: { span: 6 },
@@ -27,6 +25,7 @@ const layout2 = {
 };
 
 export function Register() {
+  const navigate = useNavigate();
   const [form] = useForm();
 
   const sendCaptcha = async () => {
@@ -35,19 +34,27 @@ export function Register() {
       return message.error('请输入邮箱地址');
     }
     const res = await registerCaptcha(address);
-    message.success(res.data.data);
+    message.success(res.data);
   };
+
+  const onFinish = useCallback(
+    async (values: RegisterUser) => {
+      if (values.password !== values.confirmPassword) {
+        return message.error('两次密码不一致');
+      }
+      await registerApi(values);
+      message.success('注册成功');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+    },
+    [navigate]
+  );
 
   return (
     <div id="register-container">
       <h1>会议室预订系统</h1>
-      <Form
-        form={form}
-        {...layout1}
-        onFinish={onFinish}
-        colon={false}
-        autoComplete="off"
-      >
+      <Form form={form} {...layout1} onFinish={onFinish} colon={false} autoComplete="off">
         <Form.Item
           label="用户名"
           name="username"

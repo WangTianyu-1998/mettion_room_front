@@ -15,12 +15,12 @@ cd dist
 # echo 'www.example.com' > CNAME
 
 git init
-git checkout -b main
+git checkout -b master
 git add -A
 git commit -m 'deploy'
 
 # https://github.com/WangTianyu-1998/mettion_room_front.git
 # 如果你要部署在 https://<USERNAME>.github.io/<REPO>
-git push -f git@github.com:WangTianyu-1998/mettion_room_front.git main:gh-pages
+git push -f https://github.com/WangTianyu-1998/mettion_room_front.git master:gh-pages
 
 cd -

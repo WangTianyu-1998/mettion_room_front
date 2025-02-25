@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { BrowserRouter, RouterProvider, createBrowserRouter, useRoutes } from 'react-router-dom';
+import { BrowserRouter, useRoutes } from 'react-router-dom';
 import { ErrorPage } from './pages/error-page';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
@@ -46,7 +46,7 @@ const Routes = () => {
 
 const Routers = () => {
   return (
-    <BrowserRouter basename="meeting-room-booking-system">
+    <BrowserRouter basename="mettion_room_front">
       <Routes />
     </BrowserRouter>
   );

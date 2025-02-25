@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import axios, { AxiosRequestConfig, type Method } from 'axios';
+import axios, { type Method } from 'axios';
 
 const baseURL = 'http://localhost:3005/';
 const instance = axios.create({

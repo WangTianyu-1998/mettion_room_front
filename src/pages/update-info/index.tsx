@@ -2,7 +2,6 @@ import { Button, Form, Input, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { useCallback, useEffect } from 'react';
 import './index.css';
-import { useNavigate } from 'react-router-dom';
 import { getUserInfoApi, updateInfo, updateUserInfoCaptcha } from './servers';
 
 export interface UserInfo {
@@ -19,8 +18,6 @@ const layout1 = {
 
 export function UpdateInfo() {
   const [form] = useForm();
-
-  const navigate = useNavigate();
 
   const onFinish = useCallback(async (values: UserInfo) => {
     await updateInfo(values);

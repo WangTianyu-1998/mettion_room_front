@@ -23,11 +23,9 @@ export function Login() {
   const onFinish = async (values: LoginUser) => {
     try {
       const res = await loginApi(values.username, values.password);
-      console.log('🚀 ~ onFinish ~ res:', res);
-      const data = res.data;
-      localStorage.setItem('access_token', data.accessToken);
-      localStorage.setItem('refresh_token', data.refreshToken);
-      localStorage.setItem('user_info', JSON.stringify(data.userInfo));
+      localStorage.setItem('access_token', res.data.accessToken);
+      localStorage.setItem('refresh_token', res.data.refreshToken);
+      localStorage.setItem('user_info', JSON.stringify(res.data.userInfo));
       message.success('登录成功');
       nav('/');
     } catch (error) {

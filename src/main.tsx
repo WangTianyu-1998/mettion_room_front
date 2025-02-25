@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { BrowserRouter, RouterProvider, createBrowserRouter, useRoutes } from 'react-router-dom';
 import { ErrorPage } from './pages/error-page';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
@@ -37,8 +37,21 @@ const routes = [
     element: <UpdatePassword />,
   },
 ];
-const router = createBrowserRouter(routes);
+// const router = createBrowserRouter(routes);
+
+const Routes = () => {
+  const routing = useRoutes(routes);
+  return routing;
+};
+
+const Routers = () => {
+  return (
+    <BrowserRouter basename="meeting-room-booking-system">
+      <Routes />
+    </BrowserRouter>
+  );
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-root.render(<RouterProvider router={router} />);
+root.render(<Routers />);

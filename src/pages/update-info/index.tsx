@@ -3,6 +3,7 @@ import { useForm } from 'antd/es/form/Form';
 import { useCallback, useEffect } from 'react';
 import './index.css';
 import { getUserInfoApi, updateInfo, updateUserInfoCaptcha } from './servers';
+import { HeadPicUpload } from './head-pic-upload';
 
 export interface UserInfo {
   headPic: string;
@@ -20,6 +21,7 @@ export function UpdateInfo() {
   const [form] = useForm();
 
   const onFinish = useCallback(async (values: UserInfo) => {
+    console.log('🚀 ~ onFinish ~ values:', values);
     await updateInfo(values);
 
     message.success('用户信息更新成功');
@@ -48,7 +50,7 @@ export function UpdateInfo() {
     <div id="updateInfo-container">
       <Form form={form} {...layout1} onFinish={onFinish} colon={false} autoComplete="off">
         <Form.Item label="头像" name="headPic" rules={[{ required: true, message: '请输入头像!' }]}>
-          <Input />
+          <HeadPicUpload />
         </Form.Item>
 
         <Form.Item
